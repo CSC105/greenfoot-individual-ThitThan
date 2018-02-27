@@ -17,12 +17,12 @@ public class GameOver extends World
     public GameOver()
     {    
         // Create a new world with 600x400 cells with a cell size of 1x1 pixels.
-        super(640, 480, 1); 
+        super(GameWorld.WIDTH, GameWorld.HEIGHT, 1); 
         
         bg = new GreenfootImage[16];
         for (int i = 0; i < bg.length; i++) {
             bg[i] = new GreenfootImage("timevortex" + i + ".jpg");
-            bg[i].scale(640, 480);
+            bg[i].scale(GameWorld.WIDTH, GameWorld.HEIGHT);
         }
         
         animateBg(1);
@@ -41,7 +41,7 @@ public class GameOver extends World
     static final double START_FRAME = 4;
     
     double frame = START_FRAME;
-    double bgSpeed = 0.15;
+    double bgSpeed = 0.1;
     public void animateBg(int frames) {
         this.frame += (frames * bgSpeed);
         

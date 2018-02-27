@@ -8,6 +8,8 @@ import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
  */
 public class Flamingo extends Actor
 {
+    public static double onGroundY = 0;
+    
     // SCALING
     public static double scale = 0.15;
     public static double width = 449 * scale;
@@ -29,7 +31,7 @@ public class Flamingo extends Actor
     public interface Callback {
         void onJumpStarted(Flamingo fla);
         void onJumpFinished(Flamingo fla);
-        void onCrashed(Flamingo fla, Actor act);
+        //void onCrashed(Flamingo fla, Actor act);
         boolean isFloating(Flamingo fla);
     }
     Callback mCallback;

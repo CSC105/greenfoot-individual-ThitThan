@@ -10,12 +10,17 @@ import java.util.HashMap;
  */
 public class GameWorld extends World
 {   
+    // WORLD
+    public static final int WIDTH = 640;
+    public static final int HEIGHT = 400;
+    
     // GROUND
     static final int GROUND_HEIGHT = 32;
     
     // DALEK
     static final int DALEK_DEFAULT_POS = -36;
-    static final int DALEK_THREAT_POS = 48;
+    static final int DALEK_THREAT_POS = 72;
+    int DALEK_VELO = 2;
     
     // ACTORS
     Flamingo fla;
@@ -31,7 +36,7 @@ public class GameWorld extends World
     public GameWorld()
     {    
         // Create a new world with 640x480 cells with a cell size of 1x1 pixels.
-        super(640, 480, 1, false);
+        super(WIDTH, HEIGHT, 1, false);
         this.groundY = getHeight() - GROUND_HEIGHT;
         
         // BACKGROUND
@@ -58,9 +63,9 @@ public class GameWorld extends World
             public void onJumpFinished(Flamingo f) {
                 ignoreGravity.remove(f);
             }
-            public void onCrashed(Flamingo f, Actor a) {
-                System.out.println("Crashed with a " + a.getClass().getSimpleName());
-            }
+            //public void onCrashed(Flamingo f, Actor a) {
+            //    System.out.println("Crashed with a " + a.getClass().getSimpleName());
+            //}
             public boolean isFloating(Flamingo f) {
                 return GameWorld.this.isFloating(f);
             }
@@ -81,18 +86,20 @@ public class GameWorld extends World
     // DALEK
     //
     boolean dalekCatchedUp = false;
+    int obstacleToOutrunDalek = 3;
+    int duckedObstacle = 0;
+    
+    boolean dalekKeyPressed = false;
+    boolean dalekSoundPlayed = false;
     
     //
     // MAIN GAME EVENTS
     //
     //int bgScrollAmount = 2;
-    static final int OBSTACLE_DISTANCE = 960;
+    static final int GRASS_DISTANCE = 960;
     static final int SPEED_UP_EVERY = 50000;
     double lastObsX = 0;
     double lastSpeedup = 0;
-    
-    boolean dalekKeyPressed = false;
-    boolean dalekSoundPlayed = false;
 
     @Override
     public void act() {
@@ -111,9 +118,28 @@ public class GameWorld extends World
         playTheme();
         
         // ADD OBSTACLES
-        if (xPos - lastObsX >= (OBSTACLE_DISTANCE / 4 * sceneVelo)) {
-            Grass grass = new Grass();
-            addObstacle(grass);
+        if (xPos - lastObsX >= (GRASS_DISTANCE / 4 * sceneVelo)) {
+            Grass grass = new Grass(fla);
+            grass.setMainChar(fla);
+            grass.setCallback(new Grass.Callback() {
+                @Override
+                public void onHitMainChar(Actor a) {
+                    if (!dalekCatchedUp)
+                        dalekCatchedUp = true;
+                    else {
+                        // loose
+                        //Greenfoot.stop();
+                        theme[0].stop();
+                        theme[1].stop();
+                        Greenfoot.setWorld(new GameOver());
+                    }
+                }
+            });
+            
+            
+            if (Greenfoot.getRandomNumber(3) < 2) {
+                addObstacle(grass);
+            }
             
             //System.out.println("lastObsX = " + lastObsX);
             lastObsX = xPos;
@@ -134,16 +160,16 @@ public class GameWorld extends World
                 dalekSoundPlayed = true;
             }
             if (dalek.getX() < DALEK_THREAT_POS)
-                dalek.setLocation(dalek.getX() + 2, dalek.getY());
+                dalek.setLocation(dalek.getX() + (int) sceneVelo, dalek.getY());
         }
         else {
             dalekSoundPlayed = false;
             if (dalek.getX() > DALEK_DEFAULT_POS)
-                dalek.setLocation(dalek.getX() - 2, dalek.getY());
+                dalek.setLocation(dalek.getX() - (int) sceneVelo, dalek.getY());
         }
         
         // PRESS 'D' TO TEST DALEK
-        if (Greenfoot.isKeyDown("d")) {
+        /*if (Greenfoot.isKeyDown("d")) {
             if (!dalekKeyPressed) {
                 dalekCatchedUp = !dalekCatchedUp;
                 dalekKeyPressed = true;
@@ -152,7 +178,7 @@ public class GameWorld extends World
         }
         else {
             dalekKeyPressed = false;
-        }
+        }*/
     }
     
     @Override
@@ -166,7 +192,10 @@ public class GameWorld extends World
         theme[1].stop();
     }
     
+    
+    //
     // SOUND
+    //
     int track = 1;
     public void playTheme() {
         if (!theme[track].isPlaying()) {
@@ -181,6 +210,7 @@ public class GameWorld extends World
             track.stop();
         }
     }
+    
     
     //
     // GRAVITY SYSTEM
@@ -226,13 +256,10 @@ public class GameWorld extends World
             
             // ignore gravity for that object
             if (ignoreGravity.indexOf(obj) != -1) {
-                //System.out.println("Ignore gravity");
                 velos.put(obj, null);
                 times.put(obj, null);
                 continue;
             }
-            
-            //int realY = obj.getY() + (obj.getImage().getHeight() / 2);
             
             if (isFloating(obj)) {
                 if (velos.get(obj) == null)
@@ -251,6 +278,11 @@ public class GameWorld extends World
                 if (getBottomY(obj) > groundY) {
                     newY = groundY - (obj.getImage().getHeight() / 2);
                     obj.setLocation(obj.getX(), newY);
+                    
+                    // if Flamingo -> save the Y value
+                    if (obj instanceof Flamingo) {
+                        Flamingo.onGroundY = newY;
+                    }
                 }
                 
                 t += 0.1;
@@ -262,8 +294,6 @@ public class GameWorld extends World
                 // Animate Flamingo feet
                 if (obj instanceof Flamingo)
                     ((Flamingo) obj).animateWalk(-1);
-                    
-                //System.out.println("NOT ON GROUND");
             }
             else if (velos.get(obj) != null) {
                 velos.put(obj, null);
@@ -271,6 +301,7 @@ public class GameWorld extends World
             }
         }
     }
+    
     
     //
     // OBSTACLES
@@ -285,10 +316,7 @@ public class GameWorld extends World
         
         // set location (put on the ground)
         int x = getWidth() + (actor.getImage().getWidth() / 2);
-        //int x = getWidth() / 2;
         int y = getHeight() - GROUND_HEIGHT - (actor.getImage().getHeight()/2);
-        System.out.println(getHeight() + " - " + GROUND_HEIGHT + " - (" + actor.getImage().getHeight() + " / 2) = " + y);
-        //int y = getHeight() / 2;
         actor.setLocation(x, y);
         
         // add to ArrayList
@@ -303,10 +331,20 @@ public class GameWorld extends World
             Actor obj = obstacles.get(i);
             obj.setLocation(obj.getX() - frames, obj.getY());
             
-            // remove when offscreen
+            // REMOVE when offscreen
             if (obj.getX() < -(obj.getImage().getWidth() / 2)) {
                 removeObstacle(obj);
-                //System.out.println("grass removed");
+                
+                if (dalekCatchedUp 
+                    && obj instanceof Grass && !((Grass)obj).isHit()) {
+                    duckedObstacle++;
+                    
+                    if (duckedObstacle >= obstacleToOutrunDalek) {
+                        dalekCatchedUp = false;
+                        duckedObstacle = 0;
+                        obstacleToOutrunDalek++;
+                    }
+                }
             }
         }
     }
