@@ -13,7 +13,6 @@ public class GameWorld extends World
     // WORLD
     public static final int WIDTH = 640;
     public static final int HEIGHT = 400;
-    
     public static final double G = 9.8;
     public static final double G_MODIFIER = 0.05;
     
@@ -35,6 +34,10 @@ public class GameWorld extends World
     
     double xPos;
     int groundY;
+    
+    // SCORE VIEW(s)
+    static final double SCORE_INCREASE_RATE = 0.1;
+    ScoreView scoreView;
     
     // Sound
     GreenfootSound[] theme;
@@ -86,6 +89,10 @@ public class GameWorld extends World
         // GROUND
         ground = new Ground(GROUND_HEIGHT);
         addObject(ground, 0, 0);
+        
+        // ADD SCORE VIEW
+        scoreView = new ScoreView(16, 32);
+        addObject(scoreView, 0, 0);
     }
     
     //
@@ -134,10 +141,14 @@ public class GameWorld extends World
     @Override
     public void act() {
         applyGravity();
-        if (invincibleMode)
+        if (invincibleMode) {
             scrollBackground(INVINCIBLE_MODE_MULTIPLIER);
-        else
+            scoreView.append(INVINCIBLE_MODE_MULTIPLIER * SCORE_INCREASE_RATE);
+        }
+        else {
             scrollBackground(1);
+            scoreView.append(1 * SCORE_INCREASE_RATE);
+        }
         
         // CONTROL
         /*if (Greenfoot.isKeyDown("right")) {
