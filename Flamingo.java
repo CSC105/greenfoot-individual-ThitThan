@@ -60,7 +60,10 @@ public class Flamingo extends Actor
     boolean wasOnGround = false;
     int jumpCount = 0;
     public void act() {
-        animateWalk(1);
+        if (invincible)
+            animateWalk(GameWorld.INVINCIBLE_MODE_MULTIPLIER);
+        else
+            animateWalk(1);
         
         // CONTROLS
         /*if (Greenfoot.isKeyDown("right")) {
@@ -116,7 +119,7 @@ public class Flamingo extends Actor
         t += 0.1;
         
         if (v < START_SPEED * 3/5)
-            animateWalk(-1);
+            animateWalk(-1 * (invincible ? GameWorld.INVINCIBLE_MODE_MULTIPLIER:1));
         //frame = 6;
         
         this.setLocation(getX(), (int) (getY() - v));
@@ -146,7 +149,7 @@ public class Flamingo extends Actor
             
         // INVINCIBILITY
         if (invincible)
-            images[this.frame].setTransparency((int) (255 * 0.5));
+            images[this.frame].setTransparency((int) (255 * 0.6));
         else
             images[this.frame].setTransparency((int) (255 * 1.0));
         

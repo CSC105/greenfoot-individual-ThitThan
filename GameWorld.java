@@ -3,10 +3,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * Write a description of class MyWorld here.
+ * Well, this is a main world, where the gameplay happens.
  * 
- * @author (your name) 
- * @version (a version number or a date)
+ * @author Thitiwat Thanyapakluepong
+ * @version beta1
  */
 public class GameWorld extends World
 {   
@@ -21,6 +21,9 @@ public class GameWorld extends World
     static final int DALEK_DEFAULT_POS = -36;
     static final int DALEK_THREAT_POS = 72;
     int DALEK_VELO = 2;
+    
+    // INVINCIBLE MODE
+    public static final int INVINCIBLE_MODE_MULTIPLIER = 4;
     
     // ACTORS
     Flamingo fla;
@@ -118,7 +121,10 @@ public class GameWorld extends World
     @Override
     public void act() {
         applyGravity();
-        scrollBackground(1);
+        if (invincibleMode)
+            scrollBackground(INVINCIBLE_MODE_MULTIPLIER);
+        else
+            scrollBackground(1);
         
         // CONTROL
         /*if (Greenfoot.isKeyDown("right")) {
@@ -193,12 +199,12 @@ public class GameWorld extends World
                 dalekSoundPlayed = true;
             }
             if (dalek.getX() < DALEK_THREAT_POS)
-                dalek.setLocation(dalek.getX() + (int) sceneVelo, dalek.getY());
+                dalek.setLocation(dalek.getX() + (int) (sceneVelo/2), dalek.getY());
         }
         else {
             dalekSoundPlayed = false;
             if (dalek.getX() > DALEK_DEFAULT_POS)
-                dalek.setLocation(dalek.getX() - (int) sceneVelo, dalek.getY());
+                dalek.setLocation(dalek.getX() - (int) (sceneVelo/2), dalek.getY());
         }
         
         // PRESS 'C' FOR INVINCIBLE MODE
@@ -206,6 +212,7 @@ public class GameWorld extends World
             if (!cheatKeyPressed) {
                 invincibleMode = !invincibleMode;
                 fla.setInvincible(invincibleMode);
+                dalekCatchedUp = false;
                 System.out.println("invincible mode : " + (invincibleMode ? "ON":"OFF"));
                 
                 cheatKeyPressed = true;
@@ -221,6 +228,7 @@ public class GameWorld extends World
         //Greenfoot.stop();
         theme[0].stop();
         theme[1].stop();
+        dalek.stopSound();
         Greenfoot.setWorld(new GameOver());
     }
     
@@ -336,7 +344,7 @@ public class GameWorld extends World
                 
                 // Animate Flamingo feet
                 if (obj instanceof Flamingo)
-                    ((Flamingo) obj).animateWalk(-1);
+                    ((Flamingo) obj).animateWalk(-1 * (invincibleMode ? INVINCIBLE_MODE_MULTIPLIER:1));
             }
             else if (velos.get(obj) != null) {
                 velos.put(obj, null);

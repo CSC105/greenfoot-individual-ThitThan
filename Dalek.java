@@ -59,4 +59,9 @@ public class Dalek extends Actor
         int rand = Greenfoot.getRandomNumber(sfx.length);
         sfx[rand].play();
     }
+    public void stopSound() {
+        for (GreenfootSound sound : sfx) {
+            sound.stop();
+        }
+    }
 }
