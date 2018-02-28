@@ -8,6 +8,12 @@ import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
  */
 public class Flamingo extends Actor
 {
+    // INVINCIBLE MODE
+    boolean invincible = false;
+    public void setInvincible(boolean invincible) {
+        this.invincible = invincible;
+    }
+    
     public static double onGroundY = 0;
     
     // SCALING
@@ -137,6 +143,12 @@ public class Flamingo extends Actor
             this.frame -= 36;
         else if (frame < 0)
             this.frame += 36;
+            
+        // INVINCIBILITY
+        if (invincible)
+            images[this.frame].setTransparency((int) (255 * 0.5));
+        else
+            images[this.frame].setTransparency((int) (255 * 1.0));
         
         //if (frame % 3 == 0)
             setImage(images[this.frame]);

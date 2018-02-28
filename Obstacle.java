@@ -77,7 +77,7 @@ public class Obstacle extends Actor
         if (mainChar != null 
             //&& this.getOneObjectAtOffset(0, 0, mainChar.getClass()) != null
             //&& this.intersects(mainChar)
-            && this.getX() > 244 && this.getX() < 361 && mainChar.getY() >= Flamingo.onGroundY - (image.getHeight() * 0.9)
+            && this.getX() > 244 && this.getX() < 361 && (mainChar.getY()) >= Flamingo.onGroundY - (image.getHeight() * 0.9)
             && this.hit == false
             && this.mCallback != null) {
                 

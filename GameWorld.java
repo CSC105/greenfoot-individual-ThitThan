@@ -92,15 +92,29 @@ public class GameWorld extends World
     boolean dalekKeyPressed = false;
     boolean dalekSoundPlayed = false;
     
+    
+    //
+    // OBSTACLES
+    //
+    //int bgScrollAmount = 2;
+    static final int GRASS_DISTANCE = 900;
+    double lastGrassX = 0;
+    double grassModifier = 1;
+    
+    static final int SPEED_UP_EVERY = 30000;
+    double lastSpeedup = 0;
+    
+    static final int ANGEL_DISTANCE = 3456;
+    double lastAngelX = 0;
+    double angelModifier = 1;
+    //boolean angelAdded = false;
+    
+    boolean invincibleMode = false;
+    boolean cheatKeyPressed = false;
+    
     //
     // MAIN GAME EVENTS
     //
-    //int bgScrollAmount = 2;
-    static final int GRASS_DISTANCE = 960;
-    static final int SPEED_UP_EVERY = 50000;
-    double lastObsX = 0;
-    double lastSpeedup = 0;
-
     @Override
     public void act() {
         applyGravity();
@@ -117,32 +131,51 @@ public class GameWorld extends World
         // SOUND
         playTheme();
         
-        // ADD OBSTACLES
-        if (xPos - lastObsX >= (GRASS_DISTANCE / 4 * sceneVelo)) {
-            Grass grass = new Grass(fla);
-            grass.setMainChar(fla);
-            grass.setCallback(new Grass.Callback() {
-                @Override
-                public void onHitMainChar(Actor a) {
-                    if (!dalekCatchedUp)
-                        dalekCatchedUp = true;
-                    else {
-                        // loose
-                        //Greenfoot.stop();
-                        theme[0].stop();
-                        theme[1].stop();
-                        Greenfoot.setWorld(new GameOver());
-                    }
-                }
-            });
-            
-            
-            if (Greenfoot.getRandomNumber(3) < 2) {
+        // ADD GRASS
+        if (xPos - lastGrassX >= (GRASS_DISTANCE * grassModifier / DEFAULT_SCENE_VELO * sceneVelo)) {
+            //if (Greenfoot.getRandomNumber(2) == 0) {
+                Grass grass = new Grass(fla);
+                grass.setCallback(new Grass.Callback() {
+                    @Override
+                    public void onHitMainChar(Actor a) {
+                        if (invincibleMode)
+                            return;
+                        
+                        if (!dalekCatchedUp)
+                            dalekCatchedUp = true;
+                            else {
+                                // loose
+                                gameOver();
+                            }
+                        }
+                    });
                 addObstacle(grass);
-            }
+            //}
             
-            //System.out.println("lastObsX = " + lastObsX);
-            lastObsX = xPos;
+            grassModifier = ((Greenfoot.getRandomNumber(3) * 2) + 9) / 10.0;
+            
+            //System.out.println("lastGrassX = " + lastGrassX);
+            lastGrassX = xPos;
+        }
+        // ADD ANGEL
+        else if (xPos - lastAngelX >= (ANGEL_DISTANCE * angelModifier / DEFAULT_SCENE_VELO * sceneVelo)) {
+            //if (Greenfoot.getRandomNumber(2) == 0) {
+                WeepingAngel angel = new WeepingAngel(fla);
+                angel.setCallback(new Obstacle.Callback() {
+                    @Override
+                    public void onHitMainChar(Actor a) {
+                        if (invincibleMode)
+                            return;
+                        
+                        gameOver();
+                    }
+                });
+                addObstacle(angel);
+            //}
+            
+            //angelModifier = (Greenfoot.getRandomNumber(5) + 10) / 10.0;
+            angelModifier = ((Greenfoot.getRandomNumber(4) * 2) + 9) / 10.0;
+            lastAngelX = xPos;
         }
         
         // SPPED UP
@@ -168,17 +201,27 @@ public class GameWorld extends World
                 dalek.setLocation(dalek.getX() - (int) sceneVelo, dalek.getY());
         }
         
-        // PRESS 'D' TO TEST DALEK
-        /*if (Greenfoot.isKeyDown("d")) {
-            if (!dalekKeyPressed) {
-                dalekCatchedUp = !dalekCatchedUp;
-                dalekKeyPressed = true;
-                //System.out.println("d pressed");
+        // PRESS 'C' FOR INVINCIBLE MODE
+        if (Greenfoot.isKeyDown("c")) {
+            if (!cheatKeyPressed) {
+                invincibleMode = !invincibleMode;
+                fla.setInvincible(invincibleMode);
+                System.out.println("invincible mode : " + (invincibleMode ? "ON":"OFF"));
+                
+                cheatKeyPressed = true;
             }
         }
         else {
-            dalekKeyPressed = false;
-        }*/
+            cheatKeyPressed = false;
+        }
+    }
+    
+    public void gameOver() {
+        // loose
+        //Greenfoot.stop();
+        theme[0].stop();
+        theme[1].stop();
+        Greenfoot.setWorld(new GameOver());
     }
     
     @Override
@@ -336,7 +379,7 @@ public class GameWorld extends World
                 removeObstacle(obj);
                 
                 if (dalekCatchedUp 
-                    && obj instanceof Grass && !((Grass)obj).isHit()) {
+                    && obj instanceof Obstacle && !((Obstacle)obj).isHit()) {
                     duckedObstacle++;
                     
                     if (duckedObstacle >= obstacleToOutrunDalek) {
