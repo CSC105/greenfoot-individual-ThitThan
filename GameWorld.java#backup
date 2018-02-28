@@ -12,13 +12,12 @@ public class GameWorld extends World
 {   
     // WORLD
     public static final int WIDTH = 640;
-    public static final int HEIGHT = 375;
-    
+    public static final int HEIGHT = 400;
     public static final double G = 9.8;
     public static final double G_MODIFIER = 0.05;
     
     // GROUND
-    static final int GROUND_HEIGHT = 24;
+    static final int GROUND_HEIGHT = 32;
     
     // DALEK
     static final int DALEK_DEFAULT_POS = -36;
@@ -26,7 +25,7 @@ public class GameWorld extends World
     int DALEK_VELO = 2;
     
     // INVINCIBLE MODE
-    public static final int INVINCIBLE_MODE_MULTIPLIER = 3;
+    public static final int INVINCIBLE_MODE_MULTIPLIER = 4;
     
     // ACTORS
     Flamingo fla;
@@ -107,24 +106,14 @@ public class GameWorld extends World
     double lastGrassX = 0;
     double grassModifier = 1;
     
-    static final int ENEMY_DISTANCE = 3456;
-    double lastEnemyX = 0;
-    double enemyModifier = 1;
-    //boolean angelAdded = false;
-    
-    static final int CYBERMAN_DISTANCE = 5678;
-    double lastCybermanX = 0;
-    double cybermanModifier = 1;
-    
-    //
-    // SPEED UP
-    //
     static final int SPEED_UP_EVERY = 30000;
     double lastSpeedup = 0;
     
-    //
-    // INVINCIBLE MODE
-    //
+    static final int ANGEL_DISTANCE = 3456;
+    double lastAngelX = 0;
+    double angelModifier = 1;
+    //boolean angelAdded = false;
+    
     boolean invincibleMode = false;
     boolean cheatKeyPressed = false;
     
@@ -152,7 +141,7 @@ public class GameWorld extends World
         
         // ADD GRASS
         if (xPos - lastGrassX >= (GRASS_DISTANCE * grassModifier / DEFAULT_SCENE_VELO * sceneVelo)) {
-            //if (Greenfoot.getRandomNumber(3) == 0) {
+            //if (Greenfoot.getRandomNumber(2) == 0) {
                 Grass grass = new Grass(fla);
                 grass.setCallback(new Grass.Callback() {
                     @Override
@@ -176,9 +165,9 @@ public class GameWorld extends World
             //System.out.println("lastGrassX = " + lastGrassX);
             lastGrassX = xPos;
         }
-        // ADD enemy
-        else if (xPos - lastEnemyX >= (ENEMY_DISTANCE * enemyModifier / DEFAULT_SCENE_VELO * sceneVelo)) {
-            if (Greenfoot.getRandomNumber(2) == 0) {
+        // ADD ANGEL
+        else if (xPos - lastAngelX >= (ANGEL_DISTANCE * angelModifier / DEFAULT_SCENE_VELO * sceneVelo)) {
+            //if (Greenfoot.getRandomNumber(2) == 0) {
                 WeepingAngel angel = new WeepingAngel(fla);
                 angel.setCallback(new Obstacle.Callback() {
                     @Override
@@ -190,45 +179,12 @@ public class GameWorld extends World
                     }
                 });
                 addObstacle(angel);
-            }
-            else {
-                CybermanHead cyberman = new CybermanHead(fla);
-                cyberman.setCallback(new Obstacle.Callback() {
-                    @Override
-                    public void onHitMainChar(Actor a) {
-                        if (invincibleMode)
-                            return;
-                        
-                        gameOver();
-                    }
-                });
-                addObstacle(cyberman);
-            }
-            
-            //enemyModifier = (Greenfoot.getRandomNumber(5) + 10) / 10.0;
-            enemyModifier = ((Greenfoot.getRandomNumber(4) * 2) + 9) / 10.0;
-            lastEnemyX = xPos;
-        }
-        /*// ADD CYBERMAN HEAD
-        else if (xPos - lastCybermanX >= (CYBERMAN_DISTANCE * cybermanModifier / DEFAULT_SCENE_VELO * sceneVelo)) {
-            //if (Greenfoot.getRandomNumber(2) == 0) {
-                CybermanHead cyberman = new CybermanHead(fla);
-                cyberman.setCallback(new Obstacle.Callback() {
-                    @Override
-                    public void onHitMainChar(Actor a) {
-                        if (invincibleMode)
-                            return;
-                        
-                        gameOver();
-                    }
-                });
-                addObstacle(cyberman);
             //}
             
-            //cybermanModifier = (Greenfoot.getRandomNumber(5) + 10) / 10.0;
-            cybermanModifier = ((Greenfoot.getRandomNumber(4) * 2) + 9) / 10.0;
-            lastCybermanX = xPos;
-        }*/
+            //angelModifier = (Greenfoot.getRandomNumber(5) + 10) / 10.0;
+            angelModifier = ((Greenfoot.getRandomNumber(4) * 2) + 9) / 10.0;
+            lastAngelX = xPos;
+        }
         
         // SPPED UP
         if (xPos - lastSpeedup >= SPEED_UP_EVERY) {
@@ -285,7 +241,8 @@ public class GameWorld extends World
     
     @Override
     public void stopped() {
-        stopTheme();
+        theme[0].stop();
+        theme[1].stop();
     }
     
     
@@ -305,8 +262,6 @@ public class GameWorld extends World
         for (GreenfootSound track : theme) {
             track.stop();
         }
-        if (dalek != null)
-            dalek.stopSound();
     }
     
     

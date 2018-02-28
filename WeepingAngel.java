@@ -9,13 +9,13 @@ import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
 public class WeepingAngel extends Obstacle
 {
     public WeepingAngel(Actor mainChar) {
-        super(mainChar, "WeepingAngel.png", 0.17);
+        super(mainChar, "WeepingAngel-small-2.png", 0.52);
     }
     
     @Override
     public void addedToWorld(World world) {
         super.addedToWorld(world);
-        image.setTransparency((int) (255 * 0.75));
+        //image.setTransparency((int) (255 * 0.75));
     }
     
     @Override

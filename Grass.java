@@ -9,6 +9,7 @@ import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
 public class Grass extends Obstacle
 {   
     public Grass(Actor mainChar) {
-        super(mainChar, "grass-blue-2.png", 0.3);
+        //super(mainChar, "grass-blue-3.png", 0.3);
+        super(mainChar, "grass-blue-2.png", 1);
     }
 }

@@ -32,9 +32,20 @@ public class GameOver extends World
         //dwTheme.playLoop();
     }
     
+    @Override
     public void act() {
         animateBg(1);
         dwTheme.playLoop();
+        
+        // CONTROL KEY
+        if (Greenfoot.isKeyDown("enter") || Greenfoot.isKeyDown("space")) {
+            playAgain();
+        }
+    }
+    
+    public void playAgain() {
+        dwTheme.stop();
+        Greenfoot.setWorld(new GameWorld());
     }
     
     // WALKING ANIMATION
@@ -69,7 +80,7 @@ public class GameOver extends World
     
     @Override
     public void stopped() {
-        frame = 0;
+        frame = START_FRAME;
         dwTheme.stop();
     }
 }

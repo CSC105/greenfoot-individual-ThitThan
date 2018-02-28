@@ -10,9 +10,9 @@ public class Dalek extends Actor
 {
     
     // SCALING
-    public static double scale = 0.7;
-    public static double width = 224 * scale;
-    public static double height = 240 * scale;
+    public static double scale = 1;
+    //public static double scale = 0.7;
+    public static double width, height;
     
     // IMAGE
     static GreenfootImage image;
@@ -23,7 +23,9 @@ public class Dalek extends Actor
     @Override
     public void addedToWorld(World world) {
         if (image == null) {
-            image = new GreenfootImage("dalek-4.png");
+            image = new GreenfootImage("dalek-small.png");
+            width = image.getWidth() * scale;
+            height = image.getHeight() * scale;
             image.scale((int) width, (int) height);
         }
         //System.out.println("DALEK height : " + height + ", getHeight() : " + image.getHeight());

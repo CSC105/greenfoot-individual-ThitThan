@@ -17,7 +17,8 @@ public class Flamingo extends Actor
     public static double onGroundY = 0;
     
     // SCALING
-    public static double scale = 0.15;
+    public static double scale = 1;
+    //public static double scale = 0.15;
     public static double width = 449 * scale;
     public static double height = 729 * scale;
     
@@ -50,7 +51,7 @@ public class Flamingo extends Actor
         images = new GreenfootImage[36];
         for (int i = 0; i < 36; i++) {
             images[i] = new GreenfootImage("Flamingo" + (i+1) + ".png");
-            images[i].scale((int) width, (int) height);
+            //images[i].scale((int) width, (int) height);
         }
         setImage( images[0] );
     }
@@ -101,8 +102,9 @@ public class Flamingo extends Actor
     // JUMPING
     //static final int JUMP_HEIGHT = 120;
     static final int MAX_JUMP = 2;
-    static final double GRAVITY = 9.8;
-    static final double START_SPEED = 12.34;
+    static final double G = GameWorld.G;
+    static final double G_MODIFIER = GameWorld.G_MODIFIER;
+    static final double START_SPEED = 11.2;
     double v = 0, t = 0;
     public void jump() {
         //System.out.println("Jumped!!");
@@ -115,11 +117,12 @@ public class Flamingo extends Actor
         //this.setLocation(getX(), getY() - JUMP_HEIGHT);
     }
     public void applyJumping() {
-        v = v - (GRAVITY * t * 0.05);
+        v = v - (G * G_MODIFIER * t);
         t += 0.1;
         
         if (v < START_SPEED * 3/5)
             animateWalk(-1 * (invincible ? GameWorld.INVINCIBLE_MODE_MULTIPLIER:1));
+        
         //frame = 6;
         
         this.setLocation(getX(), (int) (getY() - v));
