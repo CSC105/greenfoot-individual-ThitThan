@@ -43,13 +43,16 @@ public class Dalek extends Actor
     
     // SFX
     public void initSound() {
-        sfx = new GreenfootSound[2];
+        sfx = new GreenfootSound[3];
         
         sfx[0] = new GreenfootSound("dalek-stay.mp3");
-        sfx[0].setVolume(45);
+        sfx[0].setVolume(50);
         
         sfx[1] = new GreenfootSound("dalek-emergency.mp3");
         sfx[1].setVolume(75);
+        
+        sfx[2] = new GreenfootSound("dalek-groan.mp3");
+        sfx[2].setVolume(75);
         
         //sfx[2] = new GreenfootSound("dalek-exterminate.mp3");
         //sfx[2].setVolume(75);

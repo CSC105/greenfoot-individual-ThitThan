@@ -12,7 +12,7 @@ public class GameWorld extends World
 {   
     // WORLD
     public static final int WIDTH = 640;
-    public static final int HEIGHT = 375;
+    public static final int HEIGHT = 400;
     
     public static final double G = 9.8;
     public static final double G_MODIFIER = 0.05;
