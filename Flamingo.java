@@ -68,7 +68,9 @@ public class Flamingo extends Actor
     boolean jumpPressed = false;
     boolean isJumping = false;
     boolean wasOnGround = false;
-    int jumpCount = 0;
+    
+    public int jumpCount = 0;
+    
     public void act() {
         if (invincible)
             animateWalk(GameWorld.INVINCIBLE_MODE_MULTIPLIER);
@@ -105,9 +107,8 @@ public class Flamingo extends Actor
     
     void pressJumpKey() {
         //System.out.println("PRESSING");
-        if (jumpingEnabled && !jumpPressed && v < START_SPEED * 2/3 && jumpCount < MAX_JUMP) {
+        if (jumpingEnabled && !jumpPressed && v < START_SPEED * 2/3) {
             jump();
-            jumpCount++;
 
             //System.out.println("JumpCount : " + jumpCount);
             jumpPressed = true;
@@ -127,6 +128,11 @@ public class Flamingo extends Actor
     double v = 0, t = 0;
     public void jump() {
         //System.out.println("Jumped!!");
+        if (jumpCount >= MAX_JUMP)
+            return;
+        
+        jumpCount++;
+        
         if (mCallback != null)
             mCallback.onJumpStarted(this);
           

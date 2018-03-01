@@ -32,8 +32,8 @@ public class GameWorld extends World
     
     // SCORE VIEW(s)
     static final double SCORE_INCREASE_RATE = 0.02;
-    ScoreView scoreView;
-    ScoreView highScoreView;
+    TopRightScoreView scoreView;
+    TopRightScoreView highScoreView;
     
     // SOUND
     GreenfootSound[] theme;
@@ -123,14 +123,14 @@ public class GameWorld extends World
         addObject(ground, 0, 0);
         
         // ADD HIGHSCORE VIEW
-        highScoreView = new ScoreView("BEST:  %d", 16, 32);
+        highScoreView = new TopRightScoreView("BEST:  %d", 16, 32);
         addObject(highScoreView, 0, 0);
         highScoreView.setFontSize(19);
-        highScoreView.setTextColor(new Color(255, 255, 255, (int) (255 * 0.75)));
+        highScoreView.setTextColor(new Color(255, 255, 255, (int) (255 * 0.6)));
         highScoreView.setScore(ScoreView.getHighScore());
         
         // ADD SCORE VIEW
-        scoreView = new ScoreView("%d", 32, 30);
+        scoreView = new TopRightScoreView("%d", 32, 30);
         addObject(scoreView, 0, 0);
         scoreView.setFontSize(40);
         scoreView.setScore(0);
@@ -169,7 +169,9 @@ public class GameWorld extends World
         
         if (mousePressing) {
             if (!mouseClicked) {
-                fla.jump();
+                if (fla.isJumpingEnabled() && fla.jumpCount < Flamingo.MAX_JUMP) {
+                    fla.jump();
+                }
                 mouseClicked = true;
             }
         }
@@ -341,7 +343,7 @@ public class GameWorld extends World
         stopTheme();
         dalek.stopSound();
         
-        Greenfoot.setWorld(new GameOver());
+        Greenfoot.setWorld(new GameOver((int) scoreView.getScore()));
     }
     
     @Override

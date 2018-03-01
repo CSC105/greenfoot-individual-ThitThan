@@ -17,11 +17,6 @@ public class ScoreView extends Actor
         highScore = newHighScore;
     }
     
-    // MARGINS
-    int marginTop;
-    int marginRight;
-    World world;
-    
     // SCORE
     double score;
     public double getScore() {
@@ -69,40 +64,28 @@ public class ScoreView extends Actor
         return this.textColor;
     }
     
+    // BG COLOR
+    public static final Color DEFAULT_BG_COLOR = new Color(255, 255, 255, 0);
+    Color bgColor = DEFAULT_BG_COLOR;
+    public void setBackgroundColor(Color color) {
+        this.bgColor = color;
+        redrawScore();
+    }
+    public Color getBackgroundColor() {
+        return this.bgColor;
+    }
+    
     // IMAGE
     GreenfootImage image;
     
-    /*public ScoreView(int marginTop, int marginRight) {
-        this(0, marginTop, marginRight);
-    }
-    public ScoreView(double score, int marginTop, int marginRight) {
-        this("%d", score, marginTop, marginRight);
-    }*/
-    public ScoreView(String scoreFormat, int marginTop, int marginRight) {
+    public ScoreView(String scoreFormat) {
         this.scoreFormat = scoreFormat;
-        this.marginTop = marginTop;
-        this.marginRight = marginRight;
-    }
-    @Override
-    public void addedToWorld(World world) {
-        this.world = world;
-        redrawScore();
-    }
-    
-    @Override
-    public void act() {
-        //redrawScore();
-        //score++;
     }
     
     // SCORE UPDATING
     public void redrawScore() {
-        image = new GreenfootImage(String.format(this.scoreFormat, (int) this.score), fontSize, textColor, new Color(255, 255, 255, 0));
+        image = new GreenfootImage(String.format(this.scoreFormat, (int) this.score), fontSize, textColor, bgColor);
         setImage(image);
-        updatePosition();
-    }
-    public void updatePosition() {
-        if (world != null)
-            this.setLocation(world.getWidth() - (image.getWidth()/2) - marginRight, (image.getHeight() / 2) + marginTop);
+        //updatePosition();
     }
 }
