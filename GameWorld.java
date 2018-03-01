@@ -143,6 +143,7 @@ public class GameWorld extends World
     double stumblingSlowDownRatio = 0.5;
     
     // MOUSE
+    boolean mouseClicked = true;
     @Override
     public void act() {
         applyGravity();
@@ -160,6 +161,21 @@ public class GameWorld extends World
         }
         
         // CONTROL
+        // CLICK ANYWHERE TO JUMP
+        boolean mousePressing = false;
+        for (Background b : bg) {        
+            mousePressing = mousePressing || Greenfoot.mousePressed(b);
+        }
+        
+        if (mousePressing) {
+            if (!mouseClicked) {
+                fla.jump();
+                mouseClicked = true;
+            }
+        }
+        else {
+            mouseClicked = false;
+        }
         /*if (Greenfoot.isKeyDown("right")) {
             scrollBackground(1);
         }*/
