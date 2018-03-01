@@ -19,12 +19,6 @@ public class GameWorld extends World
     // GROUND
     static final int GROUND_HEIGHT = 24;
     
-    // DALEK
-    static final int DALEK_DEFAULT_POS = -36;
-    static final int DALEK_PREPARE_POS = 72;
-    static final int DALEK_EXTERMINATE_POS = 216;
-    int dalekVelo = 3;
-    
     // INVINCIBLE MODE
     public static final int INVINCIBLE_MODE_MULTIPLIER = 3;
     
@@ -39,9 +33,43 @@ public class GameWorld extends World
     // SCORE VIEW(s)
     static final double SCORE_INCREASE_RATE = 0.02;
     ScoreView scoreView;
+    ScoreView highScoreView;
     
-    // Sound
+    // SOUND
     GreenfootSound[] theme;
+    
+    // DALEK ANIMATION
+    static final int DALEK_DEFAULT_POS = -36;
+    static final int DALEK_PREPARE_POS = 72;
+    static final int DALEK_EXTERMINATE_POS = 216;
+    int dalekPrepareVelo = 2;
+    int dalekExterminateVelo = 2;
+    
+    // DALEK
+    boolean dalekCatchedUp = false;
+    boolean dalekExterminating = false;
+    boolean dalekKeyPressed = false;
+    boolean dalekSoundPlayed = false;
+    int obstacleToOutrunDalek = 3;
+    int duckedObstacle = 0;
+    
+    // OBSTACLE : GRASS
+    static final int GRASS_DISTANCE = 900;
+    double lastGrassX = 0;
+    double grassModifier = 1;
+    
+    // OBSTACLE : ENEMY
+    static final int ENEMY_DISTANCE = 3456;
+    double lastEnemyX = 0;
+    double enemyModifier = 1;
+    
+    // SPEED UP
+    static final int SPEED_UP_EVERY = 30000;
+    double lastSpeedup = 0;
+    
+    // INVINCIBLE MODE
+    boolean invincibleMode = false;
+    boolean cheatKeyPressed = false;
     
     public GameWorld()
     {    
@@ -82,7 +110,7 @@ public class GameWorld extends World
         });
         addGroundObject(fla, (getWidth()/2) - 24, getHeight() / 2);
         
-        // ENEMY (DALEK)
+        // ENEMY IN THE BACK (DALEK)
         dalek = new Dalek();
         setPaintOrder(Dalek.class, Grass.class);
         addGroundObject(dalek, DALEK_DEFAULT_POS, (int) (getHeight() * 0.25));
@@ -91,51 +119,19 @@ public class GameWorld extends World
         ground = new Ground(GROUND_HEIGHT);
         addObject(ground, 0, 0);
         
+        // ADD HIGHSCORE VIEW
+        highScoreView = new ScoreView("BEST:  %d", 16, 32);
+        addObject(highScoreView, 0, 0);
+        highScoreView.setFontSize(19);
+        highScoreView.setTextColor(new Color(255, 255, 255, (int) (255 * 0.75)));
+        highScoreView.setScore(ScoreView.getHighScore());
+        
         // ADD SCORE VIEW
-        scoreView = new ScoreView(16, 32);
+        scoreView = new ScoreView("%d", 32, 30);
         addObject(scoreView, 0, 0);
+        scoreView.setFontSize(40);
+        scoreView.setScore(0);
     }
-    
-    //
-    // DALEK
-    //
-    boolean dalekCatchedUp = false;
-    boolean dalekExterminating = false;
-    int obstacleToOutrunDalek = 3;
-    int duckedObstacle = 0;
-    
-    boolean dalekKeyPressed = false;
-    boolean dalekSoundPlayed = false;
-    
-    
-    //
-    // OBSTACLES
-    //
-    //int bgScrollAmount = 2;
-    static final int GRASS_DISTANCE = 900;
-    double lastGrassX = 0;
-    double grassModifier = 1;
-    
-    static final int ENEMY_DISTANCE = 3456;
-    double lastEnemyX = 0;
-    double enemyModifier = 1;
-    //boolean angelAdded = false;
-    
-    static final int CYBERMAN_DISTANCE = 5678;
-    double lastCybermanX = 0;
-    double cybermanModifier = 1;
-    
-    //
-    // SPEED UP
-    //
-    static final int SPEED_UP_EVERY = 30000;
-    double lastSpeedup = 0;
-    
-    //
-    // INVINCIBLE MODE
-    //
-    boolean invincibleMode = false;
-    boolean cheatKeyPressed = false;
     
     //
     // MAIN GAME EVENTS
@@ -179,6 +175,7 @@ public class GameWorld extends World
                             // loose
                             dalekExterminating = true;
                             dalek.playExterminateSound();
+                            stopTheme();
                             
                             fla.setJumpingEnabled(false);
                             ignoreGravity.remove(fla);
@@ -242,19 +239,29 @@ public class GameWorld extends World
                 dalek.playSound();
                 dalekSoundPlayed = true;
             }
-            if (dalek.getX() < DALEK_PREPARE_POS)
-                dalek.setLocation(dalek.getX() + (int) (dalekVelo), dalek.getY());
+            if (dalek.getX() < DALEK_PREPARE_POS) {
+                dalek.setLocation(dalek.getX() + (int) (dalekPrepareVelo), dalek.getY());
+                //if (dalek.getX() < (DALEK_DEFAULT_POS + DALEK_PREPARE_POS) / 2)
+                if (dalek.getX() < (DALEK_DEFAULT_POS + 40))
+                    fla.animateWalk(-1);
+            }
         }
         else {
             dalekSoundPlayed = false;
-            if (dalek.getX() > DALEK_DEFAULT_POS)
-                dalek.setLocation(dalek.getX() - (int) (dalekVelo), dalek.getY());
+            if (dalek.getX() > DALEK_DEFAULT_POS) {
+                dalek.setLocation(dalek.getX() - (int) (dalekPrepareVelo), dalek.getY());
+                //fla.animateWalk(1);
+            }
         }
         
         // DALEK EXTERMINATE
         if (dalekExterminating) {
             if (dalek.getX() < DALEK_EXTERMINATE_POS) {
-                dalek.setLocation(dalek.getX() + (int) (dalekVelo), dalek.getY());
+                dalek.setLocation(dalek.getX() + (int) (dalekExterminateVelo), dalek.getY());
+                
+                //if (dalek.getX() < (DALEK_PREPARE_POS + DALEK_EXTERMINATE_POS) / 2)
+                if (dalek.getX() < (DALEK_PREPARE_POS + 40))
+                    fla.animateWalk(-1);
             }
             else {
                 //lose
@@ -276,14 +283,20 @@ public class GameWorld extends World
         else {
             cheatKeyPressed = false;
         }
+        
+        // UPDATE HIGHSCORE
+        if (scoreView.getScore() > ScoreView.getHighScore()) {
+            ScoreView.setHighScore(scoreView.getScore());
+            highScoreView.setScore(scoreView.getScore());
+        }
     }
     
     public void gameOver() {
         // loose
         //Greenfoot.stop();
-        theme[0].stop();
-        theme[1].stop();
+        stopTheme();
         dalek.stopSound();
+        
         Greenfoot.setWorld(new GameOver());
     }
     
@@ -441,7 +454,7 @@ public class GameWorld extends World
             if (obj.getX() < -(obj.getImage().getWidth() / 2)) {
                 removeObstacle(obj);
                 
-                if (dalekCatchedUp 
+                if (dalekCatchedUp && !dalekExterminating
                     && obj instanceof Obstacle && !((Obstacle)obj).isHit()) {
                     duckedObstacle++;
                     

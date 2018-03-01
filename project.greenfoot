@@ -1,6 +1,6 @@
 #Greenfoot properties
-#Thu Mar 01 20:39:26 ICT 2018
-editor.fx.0.height=795
+#Fri Mar 02 02:08:58 ICT 2018
+editor.fx.0.height=739
 target2.width=80
 target8.name=ScoreView
 target11.y=0
@@ -74,8 +74,8 @@ dependency11.from=GameWorld
 dependency7.type=UsesDependency
 target11.type=ClassTarget
 version=3.0.0
-editor.fx.0.y=41
-editor.fx.0.x=289
+editor.fx.0.y=44
+editor.fx.0.x=276
 dependency15.from=MainMenu
 dependency6.to=Grass
 target2.showInterface=false
@@ -98,7 +98,7 @@ target9.height=50
 target12.y=0
 target12.x=0
 dependency10.type=UsesDependency
-editor.fx.0.width=876
+editor.fx.0.width=816
 target11.showInterface=false
 target10.y=0
 target10.x=0
