@@ -18,7 +18,8 @@ public class Dalek extends Actor
     static GreenfootImage image;
     
     // SFX
-    static GreenfootSound[] sfx;
+    public static GreenfootSound[] sfx;
+    public static GreenfootSound exterminate;
     
     @Override
     public void addedToWorld(World world) {
@@ -42,7 +43,6 @@ public class Dalek extends Actor
     }
     
     // SFX
-    static GreenfootSound exterminate;
     public void initSound() {
         sfx = new GreenfootSound[3];
         

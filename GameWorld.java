@@ -40,10 +40,15 @@ public class GameWorld extends World
     
     // DALEK ANIMATION
     static final int DALEK_DEFAULT_POS = -36;
-    static final int DALEK_PREPARE_POS = 72;
+    //static final int DALEK_PREPARE_POS = 72;
+    static final int DALEK_PREPARE_POS = 64;
+    //static final int DALEK_EXTERMINATE_POS = 180;
+    //static final int DALEK_PREPARE_POS = 84;
     static final int DALEK_EXTERMINATE_POS = 216;
-    int dalekPrepareVelo = 2;
-    int dalekExterminateVelo = 2;
+    
+    //static final int DALEK_DEFAULT_POS = 0;
+    //static final int DALEK_PREPARE_POS = 90;
+    //static final int DALEK_EXTERMINATE_POS = 180;
     
     // DALEK
     boolean dalekCatchedUp = false;
@@ -95,15 +100,13 @@ public class GameWorld extends World
         fla = new Flamingo();
         fla.setCallback(new Flamingo.Callback() {
             public void onJumpStarted(Flamingo f) {
+                //System.out.println("JUMP!!");
                 if (ignoreGravity.indexOf(f) == -1)
                     ignoreGravity.add(f);
             }
             public void onJumpFinished(Flamingo f) {
                 ignoreGravity.remove(f);
             }
-            //public void onCrashed(Flamingo f, Actor a) {
-            //    System.out.println("Crashed with a " + a.getClass().getSimpleName());
-            //}
             public boolean isFloating(Flamingo f) {
                 return GameWorld.this.isFloating(f);
             }
@@ -136,6 +139,10 @@ public class GameWorld extends World
     //
     // MAIN GAME EVENTS
     //
+    boolean stumblingSlowDown = false;
+    double stumblingSlowDownRatio = 0.5;
+    
+    // MOUSE
     @Override
     public void act() {
         applyGravity();
@@ -145,7 +152,11 @@ public class GameWorld extends World
         }
         else {
             scrollBackground(1);
-            scoreView.append(1 * SCORE_INCREASE_RATE * sceneVelo);
+            
+            // count score if the player haven't lost yet
+            if (!dalekExterminating) {
+                scoreView.append(1 * SCORE_INCREASE_RATE * sceneVelo);
+            }
         }
         
         // CONTROL
@@ -166,29 +177,32 @@ public class GameWorld extends World
                 grass.setCallback(new Grass.Callback() {
                     @Override
                     public void onHitMainChar(Actor a) {
-                        if (invincibleMode)
+                        if (invincibleMode)     // ignore when INVINCIBLE
                             return;
                         
-                        if (!dalekCatchedUp)
+                        if (!dalekCatchedUp) {
                             dalekCatchedUp = true;
+                            
+                            // disable JUMPING without forcing gravity
+                            fla.setJumpingEnabled(false);
+                        }
                         else {
                             // loose
                             dalekExterminating = true;
                             dalek.playExterminateSound();
                             stopTheme();
                             
+                            // disable JUMPING then force gravity immediately
                             fla.setJumpingEnabled(false);
-                            ignoreGravity.remove(fla);
-                            //gameOver();
+                            //ignoreGravity.remove(fla);
                         }
+                        
                     }
                 });
                 addObstacle(grass);
             //}
             
             grassModifier = ((Greenfoot.getRandomNumber(3) * 2) + 9) / 10.0;
-            
-            //System.out.println("lastGrassX = " + lastGrassX);
             lastGrassX = xPos;
         }
         // ADD enemy
@@ -198,7 +212,7 @@ public class GameWorld extends World
                 angel.setCallback(new Obstacle.Callback() {
                     @Override
                     public void onHitMainChar(Actor a) {
-                        if (invincibleMode)
+                        if (invincibleMode)     // ignore when INVINCIBLE
                             return;
                         
                         gameOver();
@@ -211,7 +225,7 @@ public class GameWorld extends World
                 cyberman.setCallback(new Obstacle.Callback() {
                     @Override
                     public void onHitMainChar(Actor a) {
-                        if (invincibleMode)
+                        if (invincibleMode)     // ignore when INVINCIBLE
                             return;
                         
                         gameOver();
@@ -233,38 +247,52 @@ public class GameWorld extends World
             System.out.println("lastSpeedup = " + lastSpeedup + ", velo = " + sceneVelo);
         }
         
-        // ANIMATE DALEK IF NEEDED
+        // DALEK catching up (PREPARE_POSITION)
         if (dalekCatchedUp) {
             if (!dalekSoundPlayed) {
                 dalek.playSound();
                 dalekSoundPlayed = true;
             }
             if (dalek.getX() < DALEK_PREPARE_POS) {
-                dalek.setLocation(dalek.getX() + (int) (dalekPrepareVelo), dalek.getY());
-                //if (dalek.getX() < (DALEK_DEFAULT_POS + DALEK_PREPARE_POS) / 2)
-                if (dalek.getX() < (DALEK_DEFAULT_POS + 40))
-                    fla.animateWalk(-1);
+                dalek.setLocation(dalek.getX() + (int) (sceneVelo * 2.0/3), dalek.getY());
+                //dalek.setLocation(dalek.getX() + (int) (dalekPrepareVelo), dalek.getY());
+                
+                stumblingSlowDown = true;
+            }
+            else {
+                stumblingSlowDown = false;
+                
+                // allow jumping again
+                if (!fla.isJumpingEnabled() && !dalekExterminating) {
+                    fla.setJumpingEnabled(true);
+                }
             }
         }
         else {
             dalekSoundPlayed = false;
             if (dalek.getX() > DALEK_DEFAULT_POS) {
-                dalek.setLocation(dalek.getX() - (int) (dalekPrepareVelo), dalek.getY());
-                //fla.animateWalk(1);
+                dalek.setLocation(dalek.getX() - (int) (sceneVelo * 2.0/3), dalek.getY());
+                //dalek.setLocation(dalek.getX() - (int) (dalekPrepareVelo), dalek.getY());
             }
         }
         
-        // DALEK EXTERMINATE
+        // DALEK catching up (EXTERMINATE)
         if (dalekExterminating) {
+            // prevent player from ESCAPING DEATH xD
+            fla.setJumpingEnabled(false);
+            
             if (dalek.getX() < DALEK_EXTERMINATE_POS) {
-                dalek.setLocation(dalek.getX() + (int) (dalekExterminateVelo), dalek.getY());
+                dalek.setLocation(dalek.getX() + (int) (sceneVelo * 2.0/3), dalek.getY());
+                //dalek.setLocation(dalek.getX() + (int) (dalekExterminateVelo), dalek.getY());
                 
-                //if (dalek.getX() < (DALEK_PREPARE_POS + DALEK_EXTERMINATE_POS) / 2)
-                if (dalek.getX() < (DALEK_PREPARE_POS + 40))
-                    fla.animateWalk(-1);
+                stumblingSlowDown = true;
+            }
+            else if (dalek.exterminate.isPlaying()) {
+                // wait until the "EXTERMINATE" SFX played to the end
+                stumblingSlowDown = true;
             }
             else {
-                //lose
+                // lose
                 gameOver();
             }
         }
@@ -511,12 +539,12 @@ public class GameWorld extends World
     }
     public void scrollBackground(boolean forward) {
         for (int i = 0; i < bg.length; i++) {
-            double newX = bgX[i] - ((BG_VELO / DEFAULT_SCENE_VELO * sceneVelo) * (forward ? 1.0:-1.0));
+            double newX = bgX[i] - ((BG_VELO / DEFAULT_SCENE_VELO * sceneVelo) * (forward ? 1.0:-1.0) * (stumblingSlowDown ? stumblingSlowDownRatio:1));
             //double newX = bgX[i] - (1 * (forward ? 1:-1));
             
             // DISTANCE
             //System.out.print(newX + " ");
-            xPos += (sceneVelo * (forward ? 1:-1));
+            xPos += (sceneVelo * (forward ? 1:-1) * (stumblingSlowDown ? stumblingSlowDownRatio:1));
             
             //System.out.print(" <= " + minBgX + " : " + (newX <= minBgX) + " ");
             
@@ -528,6 +556,6 @@ public class GameWorld extends World
             bg[i].setLocation((int) newX, bg[i].getY());
         }
         //System.out.println();
-        scrollObstacles((int)sceneVelo);
+        scrollObstacles((int) (sceneVelo * (stumblingSlowDown ? stumblingSlowDownRatio:1)) * (forward ? 1:-1));
     }
 }

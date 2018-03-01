@@ -1,5 +1,5 @@
 #Greenfoot properties
-#Fri Mar 02 02:08:58 ICT 2018
+#Fri Mar 02 03:28:52 ICT 2018
 editor.fx.0.height=739
 target2.width=80
 target8.name=ScoreView
@@ -81,9 +81,9 @@ dependency6.to=Grass
 target2.showInterface=false
 dependency1.from=Obstacle
 class.Ground.superclass=greenfoot.Actor
-mainWindow.y=126
+mainWindow.y=155
 target5.showInterface=false
-mainWindow.x=125
+mainWindow.x=157
 dependency19.from=Flamingo
 dependency16.to=GameWorld
 target8.showInterface=false

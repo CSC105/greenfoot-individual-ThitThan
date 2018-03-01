@@ -82,16 +82,11 @@ public class Flamingo extends Actor
         /*if (Greenfoot.isKeyDown("left")) {
             animateWalk(-2);
         }*/
-        if (jumpingEnabled && Greenfoot.isKeyDown("space") || Greenfoot.isKeyDown("up")) {
-            if (!jumpPressed && v < START_SPEED * 2/3 && jumpCount < MAX_JUMP) {
-                jump();
-                jumpCount++;
-                //System.out.println("JumpCount : " + jumpCount);
-                jumpPressed = true;
-            }
+        if (Greenfoot.isKeyDown("space") || Greenfoot.isKeyDown("up")) {
+            pressJumpKey();
         }
         else {
-            jumpPressed = false;
+            releaseJumpKey();
         }
         
         // reset jump counting
@@ -107,6 +102,21 @@ public class Flamingo extends Actor
             applyJumping();
         }
     }   
+    
+    void pressJumpKey() {
+        //System.out.println("PRESSING");
+        if (jumpingEnabled && !jumpPressed && v < START_SPEED * 2/3 && jumpCount < MAX_JUMP) {
+            jump();
+            jumpCount++;
+
+            //System.out.println("JumpCount : " + jumpCount);
+            jumpPressed = true;
+        }
+    }
+    void releaseJumpKey() {
+        //System.out.println("RELEASED");
+        jumpPressed = false;
+    }
     
     // JUMPING
     //static final int JUMP_HEIGHT = 120;
