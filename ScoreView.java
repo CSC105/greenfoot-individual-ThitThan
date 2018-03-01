@@ -46,13 +46,13 @@ public class ScoreView extends Actor
     
     @Override
     public void act() {
-        redrawScore();
+        //redrawScore();
         //score++;
     }
     
     // SCORE UPDATING
     public void redrawScore() {
-        image = new GreenfootImage((int) (this.score) + "", 40, Color.WHITE, new Color(255, 255, 255, 0));
+        image = new GreenfootImage((int) (this.score) + "", 32, Color.WHITE, new Color(255, 255, 255, 0));
         setImage(image);
         updatePosition();
     }

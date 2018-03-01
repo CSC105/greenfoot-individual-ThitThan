@@ -21,8 +21,9 @@ public class GameWorld extends World
     
     // DALEK
     static final int DALEK_DEFAULT_POS = -36;
-    static final int DALEK_THREAT_POS = 72;
-    int DALEK_VELO = 2;
+    static final int DALEK_PREPARE_POS = 72;
+    static final int DALEK_EXTERMINATE_POS = 216;
+    int dalekVelo = 3;
     
     // INVINCIBLE MODE
     public static final int INVINCIBLE_MODE_MULTIPLIER = 3;
@@ -36,7 +37,7 @@ public class GameWorld extends World
     int groundY;
     
     // SCORE VIEW(s)
-    static final double SCORE_INCREASE_RATE = 0.1;
+    static final double SCORE_INCREASE_RATE = 0.02;
     ScoreView scoreView;
     
     // Sound
@@ -99,6 +100,7 @@ public class GameWorld extends World
     // DALEK
     //
     boolean dalekCatchedUp = false;
+    boolean dalekExterminating = false;
     int obstacleToOutrunDalek = 3;
     int duckedObstacle = 0;
     
@@ -143,11 +145,11 @@ public class GameWorld extends World
         applyGravity();
         if (invincibleMode) {
             scrollBackground(INVINCIBLE_MODE_MULTIPLIER);
-            scoreView.append(INVINCIBLE_MODE_MULTIPLIER * SCORE_INCREASE_RATE);
+            scoreView.append(INVINCIBLE_MODE_MULTIPLIER * SCORE_INCREASE_RATE * sceneVelo);
         }
         else {
             scrollBackground(1);
-            scoreView.append(1 * SCORE_INCREASE_RATE);
+            scoreView.append(1 * SCORE_INCREASE_RATE * sceneVelo);
         }
         
         // CONTROL
@@ -173,12 +175,17 @@ public class GameWorld extends World
                         
                         if (!dalekCatchedUp)
                             dalekCatchedUp = true;
-                            else {
-                                // loose
-                                gameOver();
-                            }
+                        else {
+                            // loose
+                            dalekExterminating = true;
+                            dalek.playExterminateSound();
+                            
+                            fla.setJumpingEnabled(false);
+                            ignoreGravity.remove(fla);
+                            //gameOver();
                         }
-                    });
+                    }
+                });
                 addObstacle(grass);
             //}
             
@@ -220,26 +227,6 @@ public class GameWorld extends World
             enemyModifier = ((Greenfoot.getRandomNumber(4) * 2) + 9) / 10.0;
             lastEnemyX = xPos;
         }
-        /*// ADD CYBERMAN HEAD
-        else if (xPos - lastCybermanX >= (CYBERMAN_DISTANCE * cybermanModifier / DEFAULT_SCENE_VELO * sceneVelo)) {
-            //if (Greenfoot.getRandomNumber(2) == 0) {
-                CybermanHead cyberman = new CybermanHead(fla);
-                cyberman.setCallback(new Obstacle.Callback() {
-                    @Override
-                    public void onHitMainChar(Actor a) {
-                        if (invincibleMode)
-                            return;
-                        
-                        gameOver();
-                    }
-                });
-                addObstacle(cyberman);
-            //}
-            
-            //cybermanModifier = (Greenfoot.getRandomNumber(5) + 10) / 10.0;
-            cybermanModifier = ((Greenfoot.getRandomNumber(4) * 2) + 9) / 10.0;
-            lastCybermanX = xPos;
-        }*/
         
         // SPPED UP
         if (xPos - lastSpeedup >= SPEED_UP_EVERY) {
@@ -255,13 +242,24 @@ public class GameWorld extends World
                 dalek.playSound();
                 dalekSoundPlayed = true;
             }
-            if (dalek.getX() < DALEK_THREAT_POS)
-                dalek.setLocation(dalek.getX() + (int) (sceneVelo/2), dalek.getY());
+            if (dalek.getX() < DALEK_PREPARE_POS)
+                dalek.setLocation(dalek.getX() + (int) (dalekVelo), dalek.getY());
         }
         else {
             dalekSoundPlayed = false;
             if (dalek.getX() > DALEK_DEFAULT_POS)
-                dalek.setLocation(dalek.getX() - (int) (sceneVelo/2), dalek.getY());
+                dalek.setLocation(dalek.getX() - (int) (dalekVelo), dalek.getY());
+        }
+        
+        // DALEK EXTERMINATE
+        if (dalekExterminating) {
+            if (dalek.getX() < DALEK_EXTERMINATE_POS) {
+                dalek.setLocation(dalek.getX() + (int) (dalekVelo), dalek.getY());
+            }
+            else {
+                //lose
+                gameOver();
+            }
         }
         
         // PRESS 'C' FOR INVINCIBLE MODE

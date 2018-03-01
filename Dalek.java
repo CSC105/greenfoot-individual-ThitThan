@@ -42,6 +42,7 @@ public class Dalek extends Actor
     }
     
     // SFX
+    static GreenfootSound exterminate;
     public void initSound() {
         sfx = new GreenfootSound[3];
         
@@ -59,8 +60,17 @@ public class Dalek extends Actor
         
         //sfx[1] = new GreenfootSound("dalek-destroy.mp3");
         //sfx[1].setVolume(80);
+        
+        exterminate = new GreenfootSound("dalek-exterminate-2.wav");
+        exterminate.setVolume(95);
+    }
+    
+    public void playExterminateSound() {
+        stopSound();
+        exterminate.play();
     }
     public void playSound() {
+        //stopSound();
         int rand = Greenfoot.getRandomNumber(sfx.length);
         sfx[rand].play();
     }
@@ -68,5 +78,6 @@ public class Dalek extends Actor
         for (GreenfootSound sound : sfx) {
             sound.stop();
         }
+        //exterminate.stop();
     }
 }

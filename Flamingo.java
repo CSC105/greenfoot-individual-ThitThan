@@ -14,6 +14,15 @@ public class Flamingo extends Actor
         this.invincible = invincible;
     }
     
+    // CAN JUMP
+    boolean jumpingEnabled = true;
+    public void setJumpingEnabled(boolean enabled) {
+        this.jumpingEnabled = enabled;
+    }
+    public boolean isJumpingEnabled() {
+        return this.jumpingEnabled;
+    }
+    
     public static double onGroundY = 0;
     
     // SCALING
@@ -73,7 +82,7 @@ public class Flamingo extends Actor
         /*if (Greenfoot.isKeyDown("left")) {
             animateWalk(-2);
         }*/
-        if (Greenfoot.isKeyDown("space") || Greenfoot.isKeyDown("up")) {
+        if (jumpingEnabled && Greenfoot.isKeyDown("space") || Greenfoot.isKeyDown("up")) {
             if (!jumpPressed && v < START_SPEED * 2/3 && jumpCount < MAX_JUMP) {
                 jump();
                 jumpCount++;
