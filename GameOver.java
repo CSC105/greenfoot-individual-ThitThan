@@ -61,7 +61,7 @@ public class GameOver extends World
         dwTheme.playLoop();
         
         // CONTROL KEY
-        if (Greenfoot.isKeyDown("enter") || Greenfoot.isKeyDown("space") || Greenfoot.mousePressed(this)) {
+        if (frame >= 1 && Greenfoot.isKeyDown("enter") || Greenfoot.isKeyDown("space") || Greenfoot.mousePressed(this)) {
             playAgain();
         }
     }
@@ -72,7 +72,7 @@ public class GameOver extends World
     }
     
     // WALKING ANIMATION
-    static final double START_FRAME = 4;
+    static final double START_FRAME = 0;
     
     double frame = START_FRAME;
     double bgSpeed = 0.1;

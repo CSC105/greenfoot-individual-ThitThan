@@ -11,6 +11,9 @@ public class MainMenu extends World
     GreenfootSound dwTheme;
     GreenfootImage[] bg;
     
+    Title title;
+    ScoreView txtIns;
+    
     public MainMenu()
     {    
         // Create a new world with 600x400 cells with a cell size of 1x1 pixels.
@@ -45,9 +48,12 @@ public class MainMenu extends World
         txtTitle.setLocation(txtTitle.getX(), txtTitle.getY() - (txtTitle.getImage().getHeight() / 2 + 20));
         scoreView.setLocation(scoreView.getX(), scoreView.getY() + (txtTitle.getImage().getHeight() / 2 + 8))*/;
         
-        // add instruction text with ScoreView
+        // add Title
+        title = new Title();
+        addObject(title, getWidth() / 2, getHeight() / 2);
         
-        ScoreView txtIns = new ScoreView("p r e s s   < S P A C E >   t o   s t a r t");
+        // add instruction text with ScoreView
+        txtIns = new ScoreView(" p r e s s   < S P A C E >   t o   s t a r t ");
         //ScoreView txtIns = new ScoreView("w a n n a   t r y   a g a i n ?     j u s t   p r e s s   < S P A C E B A R >");
         addObject(txtIns, getWidth() / 2, getHeight() - 16);
         txtIns.setFontSize(19);
@@ -57,6 +63,9 @@ public class MainMenu extends World
         txtIns.setLocation(txtIns.getX(), txtIns.getY() - (txtIns.getImage().getHeight() / 2));
     }
     
+    static final int MAX_BLINKING_FRAMES = 60;
+    int blinkingFrame = 0;
+    boolean appear = true;
     @Override
     public void act() {
         animateBg(1);
@@ -66,6 +75,29 @@ public class MainMenu extends World
         if (Greenfoot.isKeyDown("enter") || Greenfoot.isKeyDown("space") || Greenfoot.mousePressed(this)) {
             playAgain();
         }
+        
+        // ANIMATE instruction
+        blinkingFrame %= MAX_BLINKING_FRAMES;
+        if (blinkingFrame == 0) {
+            if (!appear) {
+                txtIns.setTextColor(new Color(255, 255, 255, (int)(255 * (1))));
+                txtIns.setBackgroundColor(new Color(0, 0, 0, (int)(255 * (1))));
+            }
+            else {
+                txtIns.setTextColor(new Color(255, 255, 255, (int)(255 * (0.00))));
+                txtIns.setBackgroundColor(new Color(0, 0, 0, (int)(255 * (0.00))));
+            }
+            appear = !appear;
+        }
+        blinkingFrame++;
+        /*if ((int) frame % 8 == 0) {
+            if (txtIns.getImage().getTransparency() != 100)
+                txtIns.getImage().setTransparency(100);
+        }
+        else {
+            if (txtIns.getImage().getTransparency() != 0)
+                txtIns.getImage().setTransparency(0);
+        }*/
     }
     
     public void playAgain() {
@@ -74,7 +106,7 @@ public class MainMenu extends World
     }
     
     // WALKING ANIMATION
-    static final double START_FRAME = 4;
+    static final double START_FRAME = 0;
     
     double frame = START_FRAME;
     double bgSpeed = 0.1;

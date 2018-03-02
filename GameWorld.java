@@ -61,7 +61,7 @@ public class GameWorld extends World
     int dalekExterminateVelo = 2;
     
     // OBSTACLE : GRASS
-    static final int GRASS_DISTANCE = 900;
+    static final int GRASS_DISTANCE = 1024;
     double lastGrassX = 0;
     double grassModifier = 1;
     
