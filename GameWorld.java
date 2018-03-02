@@ -40,8 +40,8 @@ public class GameWorld extends World
     
     // DALEK ANIMATION
     static final int DALEK_DEFAULT_POS = -36;
-    //static final int DALEK_PREPARE_POS = 72;
-    static final int DALEK_PREPARE_POS = 64;
+    static final int DALEK_PREPARE_POS = 72;
+    //static final int DALEK_PREPARE_POS = 64;
     //static final int DALEK_EXTERMINATE_POS = 180;
     //static final int DALEK_PREPARE_POS = 84;
     static final int DALEK_EXTERMINATE_POS = 216;
@@ -57,6 +57,8 @@ public class GameWorld extends World
     boolean dalekSoundPlayed = false;
     int obstacleToOutrunDalek = 3;
     int duckedObstacle = 0;
+    int dalekPrepareVelo = 2;
+    int dalekExterminateVelo = 2;
     
     // OBSTACLE : GRASS
     static final int GRASS_DISTANCE = 900;
@@ -201,8 +203,8 @@ public class GameWorld extends World
                         if (!dalekCatchedUp) {
                             dalekCatchedUp = true;
                             
-                            // disable JUMPING without forcing gravity
-                            fla.setJumpingEnabled(false);
+                            // disable JUMPING
+                            //fla.setJumpingEnabled(false);
                         }
                         else {
                             // loose
@@ -210,7 +212,7 @@ public class GameWorld extends World
                             dalek.playExterminateSound();
                             stopTheme();
                             
-                            // disable JUMPING then force gravity immediately
+                            // disable JUMPING
                             fla.setJumpingEnabled(false);
                             //ignoreGravity.remove(fla);
                         }
@@ -262,7 +264,7 @@ public class GameWorld extends World
             sceneVelo += 1;
             lastSpeedup = xPos;
             
-            System.out.println("lastSpeedup = " + lastSpeedup + ", velo = " + sceneVelo);
+            System.out.println("speedup at x = " + lastSpeedup + ", velo = " + sceneVelo);
         }
         
         // DALEK catching up (PREPARE_POSITION)
@@ -272,8 +274,8 @@ public class GameWorld extends World
                 dalekSoundPlayed = true;
             }
             if (dalek.getX() < DALEK_PREPARE_POS) {
-                dalek.setLocation(dalek.getX() + (int) (sceneVelo * 2.0/3), dalek.getY());
-                //dalek.setLocation(dalek.getX() + (int) (dalekPrepareVelo), dalek.getY());
+                //dalek.setLocation(dalek.getX() + (int) (sceneVelo * 2.0/3), dalek.getY());
+                dalek.setLocation(dalek.getX() + (int) (dalekPrepareVelo * sceneVelo / DEFAULT_SCENE_VELO) , dalek.getY());
                 
                 stumblingSlowDown = true;
             }
@@ -289,8 +291,8 @@ public class GameWorld extends World
         else {
             dalekSoundPlayed = false;
             if (dalek.getX() > DALEK_DEFAULT_POS) {
-                dalek.setLocation(dalek.getX() - (int) (sceneVelo * 2.0/3), dalek.getY());
-                //dalek.setLocation(dalek.getX() - (int) (dalekPrepareVelo), dalek.getY());
+                //dalek.setLocation(dalek.getX() - (int) (sceneVelo * 2.0/3), dalek.getY());
+                dalek.setLocation(dalek.getX() - (int) (dalekPrepareVelo * sceneVelo / DEFAULT_SCENE_VELO), dalek.getY());
             }
         }
         
@@ -300,14 +302,18 @@ public class GameWorld extends World
             fla.setJumpingEnabled(false);
             
             if (dalek.getX() < DALEK_EXTERMINATE_POS) {
-                dalek.setLocation(dalek.getX() + (int) (sceneVelo * 2.0/3), dalek.getY());
-                //dalek.setLocation(dalek.getX() + (int) (dalekExterminateVelo), dalek.getY());
+                //dalek.setLocation(dalek.getX() + (int) (sceneVelo * 2.0/3), dalek.getY());
+                dalek.setLocation(dalek.getX() + (int) (dalekExterminateVelo * sceneVelo / DEFAULT_SCENE_VELO), dalek.getY());
                 
                 stumblingSlowDown = true;
             }
             else if (dalek.exterminate.isPlaying()) {
                 // wait until the "EXTERMINATE" SFX played to the end
                 stumblingSlowDown = true;
+                
+                // stop background
+                scrollBackground(-1);
+                fla.animateWalk(-1);
             }
             else {
                 // lose

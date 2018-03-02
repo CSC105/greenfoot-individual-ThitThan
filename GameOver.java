@@ -9,10 +9,7 @@ import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
 public class GameOver extends World
 {
     GreenfootSound dwTheme;
-    
     GreenfootImage[] bg;
-    
-    boolean skipLightning = false;
     
     public GameOver(int score)
     {    
@@ -37,8 +34,9 @@ public class GameOver extends World
         scoreView.setFontSize(100);
         scoreView.setScore(score);
         
-        // add instruction text with ScoreView
-        ScoreView txtTitle = new ScoreView("Y O U   S C O R E D");
+        // add Title text with ScoreView
+        //System.out.println(score + " == " + ScoreView.getHighScore() + " : " + (score == ScoreView.getHighScore()));
+        ScoreView txtTitle = new ScoreView(((int)score == (int)ScoreView.getHighScore()) ? "N E W\nH I G H S C O R E !!" : "Y O U   S C O R E D");
         addObject(txtTitle, getWidth() / 2, getHeight() / 2);
         txtTitle.setFontSize(24);
         txtTitle.setScore(0);
@@ -46,9 +44,9 @@ public class GameOver extends World
         txtTitle.setLocation(txtTitle.getX(), txtTitle.getY() - (txtTitle.getImage().getHeight() / 2 + 20));
         scoreView.setLocation(scoreView.getX(), scoreView.getY() + (txtTitle.getImage().getHeight() / 2 + 8));
         
-        // add instruction text with ScoreView
-        ScoreView txtIns = new ScoreView("w a n n a   t r y   a g a i n ?     j u s t   p r e s s   ' S P A C E B A R '");
-        //ScoreView txtIns = new ScoreView("p r e s s   ' S P A C E B A R '   t o   t r y   a g a i n");
+        // add Instruction text with ScoreView
+        //ScoreView txtIns = new ScoreView("p r e s s   < S P A C E >   t o   t r y   a g a i n");
+        ScoreView txtIns = new ScoreView("w a n n a   t r y   a g a i n ?      p r e s s   < S P A C E >");
         addObject(txtIns, getWidth() / 2, getHeight() - 16);
         txtIns.setFontSize(19);
         txtIns.setScore(0);

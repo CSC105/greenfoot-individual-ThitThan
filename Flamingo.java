@@ -124,7 +124,7 @@ public class Flamingo extends Actor
     static final int MAX_JUMP = 2;
     static final double G = GameWorld.G;
     static final double G_MODIFIER = GameWorld.G_MODIFIER;
-    static final double START_SPEED = 11.2;
+    static final double START_SPEED = 11.5;
     double v = 0, t = 0;
     public void jump() {
         //System.out.println("Jumped!!");
